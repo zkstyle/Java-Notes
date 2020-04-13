@@ -45,7 +45,7 @@ ReetrantLock通过AQS实现了自己的同步器`Sync`，分为公平锁`FairSyn
 
 `lock()`方法用于获取锁，两种类型的锁源码实现如下：
 
-```java
+```
 //获取锁，一直等待锁可用
 public void lock() {
     sync.lock();
@@ -65,7 +65,7 @@ final void lock() {
 }
 ```
 
-**说明：**公平锁的`lock`方法调用了AQS的`acquire(1)`；而非公平锁则直接通过CAS修改`state`值来获取锁，当获取失败时才会调用`acquire(1)`来获取锁。
+ 说明：公平锁的`lock`方法调用了AQS的`acquire(1)`；而非公平锁则直接通过CAS修改`state`值来获取锁，当获取失败时才会调用`acquire(1)`来获取锁。
  关于`acquire()`方法，在上篇介绍AQS的时候已经讲过，印象不深的同学可以翻回去看一下，这里主要来看一下`tryAcquire`在ReetrantLock中的实现。
 
 **公平锁tryAcquire：**
@@ -93,7 +93,7 @@ protected final boolean tryAcquire(int acquires) {
 }
 ```
 
-**说明：**公平锁模式下的`tryAcquire`，执行流程如下：
+说明：公平锁模式下的`tryAcquire`，执行流程如下：
 
 1. 如果当前锁状态`state`为0，说明锁处于闲置状态可以被获取，首先调用`hasQueuedPredecessors`方法判断当前线程是否还有前节点(prev node)在等待获取锁。如果有，则直接返回false；如果没有，通过调用`compareAndSetState`（CAS）修改state值来标记自己已经拿到锁，CAS执行成功后调用`setExclusiveOwnerThread`设置锁的持有者为当前线程。程序执行到现在说明锁获取成功，返回true；
 
@@ -141,7 +141,7 @@ final boolean nonfairTryAcquire(int acquires) {
 }
 ```
 
-**说明：**通过对比公平锁和非公平锁`tryAcquire`的代码可以看到，非公平锁的获取略去了`!hasQueuedPredecessors()`这一操作，也就是说它不会判断当前线程是否还有前节点(prev node)在等待获取锁，而是直接去进行锁获取操作。
+说明：通过对比公平锁和非公平锁`tryAcquire`的代码可以看到，非公平锁的获取略去了`!hasQueuedPredecessors()`这一操作，也就是说它不会判断当前线程是否还有前节点(prev node)在等待获取锁，而是直接去进行锁获取操作。
 
 ### unlock()
 
@@ -152,7 +152,7 @@ public void unlock() {
 }
 ```
 
-**说明：**关于`release()`方法，在上篇介绍AQS的时候已经讲过，印象不深的同学可以翻回去看一下，这里主要来看一下`tryRelease`在ReetrantLock中的实现：
+**说明**:关于`release()`方法，在上篇介绍AQS的时候已经讲过，印象不深的同学可以翻回去看一下，这里主要来看一下`tryRelease`在ReetrantLock中的实现：
 
 ```java
 protected final boolean tryRelease(int releases) {
@@ -169,7 +169,7 @@ protected final boolean tryRelease(int releases) {
 }
 ```
 
-**说明：**`tryRelease`用于释放给定量的资源。在ReetrantLock中每次释放量为1，也就是说，**在可重入锁中，获取锁的次数必须要等于释放锁的次数，这样才算是真正释放了锁。**在锁全部释放后（`state==0`）才可以唤醒下一个等待线程。
+**说明**：`tryRelease`用于释放给定量的资源。在ReetrantLock中每次释放量为1，也就是说，**在可重入锁中，获取锁的次数必须要等于释放锁的次数，这样才算是真正释放了锁。**在锁全部释放后（`state==0`）才可以唤醒下一个等待线程。
 
 ### 等待条件Condition
 
@@ -278,7 +278,7 @@ final boolean transferForSignal(Node node) {
 }
 ```
 
-**说明：**`signal`方法用于发送唤醒信号。在不考虑线程争用的情况下，执行流程如下：
+**说明**:`signal`方法用于发送唤醒信号。在不考虑线程争用的情况下，执行流程如下：
 
 1. 获取条件队列的首节点，解除首节点的链接（`first.nextWaiter = null;`）；
 2. 调用`transferForSignal`把条件队列的首节点转移到等待队列的尾部。在`transferForSignal`中，转移节点后，转移的节点没有前继节点，说明当前最后一个等待线程，直接调用`unpark()`唤醒当前线程。
