@@ -1,6 +1,7 @@
 import sun.applet.AppletClassLoader;
 
 import java.lang.reflect.Proxy;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @BelongsProject: Java-Notes
@@ -13,6 +14,8 @@ public class Test {
     public static void main(String[] args) {
         //Proxy.newProxyInstance(Object obj,);
         //InvocationHandler
+        ReentrantLock lock;
+
 
 
     }
