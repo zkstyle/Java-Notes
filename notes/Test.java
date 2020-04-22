@@ -1,6 +1,8 @@
 import sun.applet.AppletClassLoader;
 
 import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -15,8 +17,12 @@ public class Test {
         //Proxy.newProxyInstance(Object obj,);
         //InvocationHandler
         ReentrantLock lock;
+        LinkedHashMap linkedHashMap;
+        CountDownLatch latch;
 
 
 
     }
+
+
 }
