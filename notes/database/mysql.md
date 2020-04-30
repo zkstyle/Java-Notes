@@ -80,3 +80,60 @@ MySql通过三个线程来完成主从库间的数据复制，其中Binlog Dump�
 当在从库上启动复制时，首先创建I/O线程连接主库，主库随后创建Binlog Dump线程读取数据库事件并发送给I/O线程，I/O线程获取到事件数据后更新到从库的中继日志Relay Log中去，之后从库上的SQL线程读取中继日志Relay Log中更新的数据库事件并应用，如下图所示。
 
 ![im](../images/mysql01.webp)
+## Bin-log二进制日志三种模式的日志格式
+一、STATEMENT
+STATEMENT：顾名思义，STATEMENT 格式的 Binlog 记录的是数据库上执行的原生SQL语句；
+
+Statement Level模式
+每一条修改数据的sql都会记录到master的bin_log中，slave在复制的时候sql进程会解析成master端执行过的相同的sql在slave库上再次执行。
+
+优点：
+statement level下的优点首先就是解决了row level下的缺点，不需要记录每一行的变化，较少bin-log日志量，节约IO，提高性能。因为它只需要记录在master上所执行的语句的细节，以及执行语句时候的上下文信息。
+
+缺点：
+
+由于它是记录执行语句，所以，为了让这些语句在slave端也能正确执行，那么它还必须记录每条语句在执行的时候的一些相关信息，也就是上下文信息，来保证所有语句在slave端能够得到和在master端相同的执行结果。由于mysql更新较快，使mysql的赋值遇到了不小的挑战，自然赋值的时候就会涉及到越复杂的内容，bug也就容易出现。在statement level下，目前就已经发现了不少情况会造成mysql的复制出现问题，主要是修改数据的时候使用了某些特定的函数或者功能的时候会出现。比如：sleep（）函数在有些版本中就不能正确赋值，在存储过程中使用了last_insert_id（）函数，可能会使slave和master上得到不一致的id等等。由于row level是基于每一行记录的裱花，所以不会出现类似的问题。
+
+总结：
+Statement level优点：1、解决了row level的缺点，不需要记录每一行的变化；2、日志量少，节约IO，从库应用日志块。
+
+Statement level缺点：一些新功能同步可能会有障碍,比如函数、触发器等。
+
+二、ROW
+ROW：这种格式的 Binlog 记录的是数据表的行是怎样被修改的。
+
+Row Level模式
+日志中会记录成每一行数据修改的形式，然后在slave端再对相同的数据进行修改。
+
+优点：
+在row level的模式下，bin_log中可以不记录执行的sql语句的上下文信息，仅仅只需要记录哪一条记录被修改，修改成什么样。所以row level的日志内容会非常清楚的记录每一行数据修改的细节，非常容易理解。而且不会出现某些特定情况下的存储过程，或fuction，以及trigger的调用或处罚无法被正确复制的问题。
+
+缺点：
+row level模式下，所有的执行语句都会记录到日志中，同时都会以每行记录修改的来记录，这样可能会产生大量的日志内容。
+
+总结：
+row level的优点：1、记录详细；2、解决statement level模式无法解决的复制问题。
+
+row level的缺点：日志量大，因为是按行来拆分。
+
+三、MIXED
+MIXED：混合模式，如果设置了这种格式，MariaDB / MySQL 会在一些特定的情况下自动从 STATEMENT 格式切换到 ROW 格式。例如，包含 UUID 等不确定性函数的语句，引用了系统变量的语句等等。
+
+Mixed模式（混合模式）
+
+实际上就是前两种模式的结合，在mixed模式下，mysql会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也是在statement和row之间选择一种。
+
+新版本中的mysql中对row level模式也做了优化，并不是所有的修改都会以row level来记录，像遇到表结构变更的时候就会以statement模式来记录，如果sql语句确实就是update或者delete等修改数据的语句，那么还是会记录所有行的变更。
+
+总结：
+
+mysql二进制日志格式也推荐大家用mixed；
+## 一、索引
+B+ Tree 原理
+### 1. 数据结构
+B Tree 指的是 Balance Tree，也就是平衡树。平衡树是一颗查找树，并且所有叶子节点位于同一层。
+
+B+ Tree 是基于 B Tree 和叶子节点顺序访问指针进行实现，它具有 B Tree 的平衡性，并且通过顺序访问指针来提高区间查询的性能。
+
+在 B+ Tree 中，一个节点中的 key 从左到右非递减排列，如果某个指针的左右相邻 key 分别是 keyi 和 keyi+1，且不为 null，则该指针指向节点的所有 key 大于等于 keyi 且小于等于 keyi+1。
+
