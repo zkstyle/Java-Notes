@@ -72,13 +72,13 @@ Class 文件中的常量池（编译器生成的字面量和符号引用）会�
 
 在两个对象出现循环引用的情况下，此时引用计数器永远不为 0，导致无法对它们进行回收。正是因为循环引用的存在，因此 Java 虚拟机不使用引用计数算法。
 ~~~
-public class Test {
+public class codedemo.Test {
 
     public Object instance = null;
 
     public static void main(String[] args) {
-        Test a = new Test();
-        Test b = new Test();
+        codedemo.Test a = new codedemo.Test();
+        codedemo.Test b = new codedemo.Test();
         a.instance = b;
         b.instance = a;
         a = null;

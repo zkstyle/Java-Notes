@@ -1,3 +1,5 @@
+package codedemo;
+
 import java.util.concurrent.Semaphore;
 
 /**
@@ -9,6 +11,8 @@ import java.util.concurrent.Semaphore;
  */
 
 public class TestSemaphore {
+
+
     static class Worker extends Thread{
         private int num;
         private Semaphore semaphore;

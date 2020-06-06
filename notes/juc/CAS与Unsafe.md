@@ -57,7 +57,7 @@ I：无效的。本CPU中的这份缓存已经无效。
 
 以AtomicInteger为例，内部的CAS实现如下：
 
-~~~ java
+~~~java
 public class AtomicInteger extends Number implements java.io.Serializable {
     private static final long serialVersionUID = 6214790243416807050L;
 

@@ -1,3 +1,7 @@
+package codedemo;
+
+import java.util.ArrayList;
+
 /**
  * @BelongsProject: Java-Notes
  * @BelongsPackage: PACKAGE_NAME
@@ -98,7 +102,9 @@ public class Sort {
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i]+",");
         }
-
+        while (true){
+            System.out.println(1);
+        }
 
     }
 
@@ -126,5 +132,7 @@ public class Sort {
             }
         }
     }
+
+
 
 }

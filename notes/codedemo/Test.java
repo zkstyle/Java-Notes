@@ -1,9 +1,9 @@
+package codedemo;
 
-import java.lang.ref.PhantomReference;
+import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.nio.channels.DatagramChannel;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
@@ -18,7 +18,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Test implements InvocationHandler {
 
+    public static class T extends Thread{
+        @Override
+        public void run() {
+            System.out.println("test");
+        }
+    }
+
     private static final int anInt = new Random().nextInt(20);
+
+
     public static void main(String[] args){
         //Proxy.newProxyInstance(Object obj,);
         //InvocationHandler
@@ -45,9 +54,23 @@ public class Test implements InvocationHandler {
         ConcurrentSkipListMap map;
         ConcurrentLinkedQueue queue;
         ConcurrentLinkedDeque deque;
+        SynchronousQueue queue1;
+        LinkedTransferQueue queue2;
+        LinkedBlockingQueue queue3;
+        DelayQueue queue4;
+
+        LinkedHashMap map1;
 
         ThreadPoolExecutor executor1;
 
+
+        T t=new T();
+        Thread thread=new Thread(t);
+        thread.start();
+        ThreadLocal threadLocal;
+        InvocationHandler handler;
+
+        InputStream inputStream;
 
 
         Test.inner in=new Test().new inner();
@@ -61,6 +84,12 @@ public class Test implements InvocationHandler {
 
         pri pri=new Test().new pri();
         System.out.println(pri.d);
+
+        String s="hello";
+        final Object object=s;
+        s="hduw";
+        System.out.println(s+"=="+object.toString());
+
 
 
 
@@ -82,6 +111,7 @@ public class Test implements InvocationHandler {
     private class pri{
         int d=4;
     }
+
 
 
 
