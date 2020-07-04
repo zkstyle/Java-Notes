@@ -1,5 +1,9 @@
 package codedemo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -33,7 +37,7 @@ public class TestSemaphore {
             }
         }
     }
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // 机器数目，即5个许可
         Semaphore semaphore = new Semaphore(5);
         // 8个线程去抢许可
@@ -46,8 +50,41 @@ public class TestSemaphore {
         long maxMemory = Runtime.getRuntime().maxMemory();
         System.out.println("Total_Memory(-Xms)="+totalMemory+"(字节)、"+(totalMemory/(double)1024/1024)+"MB");
         System.out.println("Max_Memory(-Xmx) = "+maxMemory+" (字节)、"+(maxMemory/(double)1024/1024)+"MB");
-        while (true){
 
+    }*/
+
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add((int) (Math.random() * 100));
+        }
+
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        System.out.println("开始往PriorityQueue添加元素");
+        for (int i = 0; i < list.size(); i++) {
+            System.out.print("添加元素：" + list.get(i) + "--");
+            queue.add(list.get(i));
+
+            System.out.print("-- PriorityQueue中数组queue = ");
+            Iterator<Integer> temp = queue.iterator();
+            while (temp.hasNext()) {
+                System.out.print(temp.next() + "--");
+            }
+            System.out.println();
+        }
+
+        System.out.println();
+
+        System.out.println("依次poll() PriorityQueue中的元素");
+        int size = queue.size();
+        for (int i = 0; i < size; i++) {
+            System.out.print("queue.poll() = " + queue.poll() + "-- PriorityQueue中数组queue = ");
+
+            Iterator<Integer> temp = queue.iterator();
+            while (temp.hasNext()) {
+                System.out.print(temp.next() + "--");
+            }
+            System.out.println();
         }
     }
 }

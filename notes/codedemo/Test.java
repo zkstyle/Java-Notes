@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @BelongsProject: Java-Notes
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @Description:
  */
 public class Test implements InvocationHandler {
+    public  int getAnInt=2;
 
     public static class T extends Thread{
         @Override
@@ -27,11 +29,15 @@ public class Test implements InvocationHandler {
 
     private static final int anInt = new Random().nextInt(20);
 
+    void f(){
+        Integer i=new Integer(1);
+    }
 
     public static void main(String[] args){
         //Proxy.newProxyInstance(Object obj,);
         //InvocationHandler
         ReentrantLock lock;
+        ReentrantReadWriteLock lock1;
         LinkedHashMap linkedHashMap;
         CountDownLatch latch;
         ExecutorService executor;
@@ -45,7 +51,6 @@ public class Test implements InvocationHandler {
         LinkedList linkedList;
         HashSet set;
         AbstractQueuedSynchronizer synchronizer;
-        ReentrantLock lock1;
 
         //JUC数据结构
         CopyOnWriteArrayList list1;
@@ -62,6 +67,13 @@ public class Test implements InvocationHandler {
         LinkedHashMap map1;
 
         ThreadPoolExecutor executor1;
+
+
+        ArrayList list2;
+        LinkedList linkedList1;
+        Vector vector1;
+        Stack stack;
+        ArrayDeque deque1;
 
 
         T t=new T();
