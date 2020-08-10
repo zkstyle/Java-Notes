@@ -74,6 +74,7 @@ public class Test implements InvocationHandler {
         Vector vector1;
         Stack stack;
         ArrayDeque deque1;
+        Hashtable hashtable;
 
 
         T t=new T();
