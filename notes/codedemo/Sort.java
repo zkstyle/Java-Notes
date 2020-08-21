@@ -1,7 +1,6 @@
 package codedemo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * @BelongsProject: Java-Notes
@@ -73,8 +72,7 @@ public class Sort {
      * @param right
      */
     public static void quickSort(int[] a, int left, int right) {
-        if (left > right)
-            return;
+        if (left > right) return;
         int pivot = a[left];//定义基准值为数组第一个数
         int i = left;
         int j = right;
@@ -97,14 +95,30 @@ public class Sort {
     }
 
     public static void main(String[] args) {
-        int[] a={6,2,3,5,9,0,4,7,1};
-        quickSort(a,0,a.length-1);
+        int[] num={6,2,3,5,9,0,4,7,1};
+        quickSort(num,0,num.length-1);
         //shellSort(a);
-        for (int i = 0; i < a.length; i++) {
-            System.out.print(a[i]+",");
+        for (int i = 0; i < num.length; i++) {
+            System.out.print(num[i]+",");
         }
-        while (true){
-            System.out.println(1);
+        System.out.println();
+
+        int[][] matrix = {{0, 30}, {15, 20}, {5, 10}, {-10, 20}};
+        //排序
+        Arrays.sort(matrix, (a, b) -> (a[0] - b[0]));
+        //Arrays.sort(matrix,(a,b)->(a[1]-b[1]));
+        /*Arrays.sort(matrix, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0]-o2[0];
+            }
+        });*/
+        //打印结果
+        for (int[] arr : matrix) {
+            for (int a : arr) {
+                System.out.print(a + " ");
+            }
+            System.out.println();
         }
 
     }
@@ -129,10 +143,12 @@ public class Sort {
                     t -= step;
                 }
                 arr[t + step] = temp;
-
             }
         }
     }
+
+
+
 
 
 
