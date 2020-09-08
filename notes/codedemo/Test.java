@@ -75,6 +75,7 @@ public class Test implements InvocationHandler {
         Stack stack;
         ArrayDeque deque1;
         Hashtable hashtable;
+        HashMap map2;
 
 
         T t=new T();
@@ -84,6 +85,8 @@ public class Test implements InvocationHandler {
         InvocationHandler handler;
 
         InputStream inputStream;
+        LinkedHashMap map3;
+
 
 
         Test.inner in=new Test().new inner();
@@ -104,8 +107,10 @@ public class Test implements InvocationHandler {
         System.out.println(s+"=="+object.toString());
 
 
+    }
 
-
+    public void ff(){
+        ExecutorService service=Executors.newFixedThreadPool(1);
     }
 
     class inner{
