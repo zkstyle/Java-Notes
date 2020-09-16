@@ -39,7 +39,7 @@ public class LRUCache {
     public void set(String key, Object value) {
         LRUNode node = map.get(key);
         if (node != null) {
-            node = map.get(key);
+            //node = map.get(key);
             node.value = value;
             remove(node, false);
         } else {
@@ -98,7 +98,7 @@ public class LRUCache {
         this.map = new HashMap<>();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         LRUCache lruCache=new LRUCache(4);
         lruCache.set("1",new LRUNode("1","2"));
         lruCache.set("2",new LRUNode("2","2"));
