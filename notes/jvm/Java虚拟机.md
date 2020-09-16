@@ -110,7 +110,7 @@ Java 虚拟机使用该算法来判断对象是否可被回收，GC Roots 一般
 加载该类的 ClassLoader 已经被回收。
 该类对应的 Class 对象没有在任何地方被引用，也就无法在任何地方通过反射访问该类方法。
 
-### 4. finalize()
+### 4.finalize()
 类似 C++ 的析构函数，用于关闭外部资源。但是 try-finally 等方式可以做得更好，并且该方法运行代价很高，不确定性大，无法保证各个对象的调用顺序，因此最好不要使用。
 
 当一个对象可被回收时，如果需要执行该对象的 finalize() 方法，那么就有可能在该方法中让对象重新被引用，从而实现自救。自救只能进行一次，如果回收的对象之前调用了 finalize() 方法自救，后面回收时不会再调用该方法。
@@ -120,14 +120,14 @@ Java 虚拟机使用该算法来判断对象是否可被回收，GC Roots 一般
 
 Java 提供了四种强度不同的引用类型。
 
-###　1. 强引用
+### 1. 强引用
 被强引用关联的对象不会被回收。
 
 使用 new 一个新对象的方式来创建强引用。
 
 Object obj = new Object();
 
-###　2. 软引用
+### 2. 软引用
 被软引用关联的对象只有在内存不够的情况下才会被回收。
 
 使用 SoftReference 类来创建软引用。
@@ -136,7 +136,7 @@ Object obj = new Object();
 SoftReference<Object> sf = new SoftReference<Object>(obj);
 obj = null;  // 使对象只被软引用关联
 ~~~
-###　3. 弱引用
+### 3.弱引用
 被弱引用关联的对象一定会被回收，也就是说它只能存活到下一次垃圾回收发生之前。
 
 使用 WeakReference 类来创建弱引用。
@@ -145,7 +145,7 @@ Object obj = new Object();
 WeakReference<Object> wf = new WeakReference<Object>(obj);
 obj = null;
 ~~~
-###　4. 虚引用
+### 4.虚引用
 又称为幽灵引用或者幻影引用，一个对象是否有虚引用的存在，不会对其生存时间造成影响，也无法通过虚引用得到一个对象。
 
 为一个对象设置虚引用的唯一目的是能在这个对象被回收时收到一个系统通知。
@@ -156,8 +156,9 @@ Object obj = new Object();
 PhantomReference<Object> pf = new PhantomReference<Object>(obj, null);
 obj = null;
 ~~~
-##　垃圾收集算法
-###　1.标记 - 清除
+## 垃圾收集算法
+
+### 1.标记-清除
 
 在标记阶段，程序会检查每个对象是否为活动对象，如果是活动对象，则程序会在对象头部打上标记。
 
