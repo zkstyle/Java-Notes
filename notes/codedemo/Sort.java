@@ -100,7 +100,8 @@ public class Sort {
         int[] num={6,2,3,5,9,0,4,7,1};
         //quickSort(num,0,num.length-1);
         //shellSort(a);
-        Insertsort(num);
+        //Insertsort(num);
+        num=MergeSort(num);
         for (int i = 0; i < num.length; i++) {
             System.out.print(num[i]+",");
         }
@@ -150,6 +151,30 @@ public class Sort {
         }
         
     }
+
+
+
+    public static int[] MergeSort(int[] array) {
+        if (array.length < 2) return array;
+        int mid = array.length / 2;
+        int[] left = Arrays.copyOfRange(array, 0, mid);
+        int[] right = Arrays.copyOfRange(array, mid, array.length);
+        return merge(MergeSort(left), MergeSort(right));
+    }
+    /**
+     * 归并排序——将两段排序好的数组结合成一个排序数组
+     */
+    public static int[] merge(int[] left, int[] right) {
+        int leftLen=left.length,rightLen=right.length;
+        int[] result = new int[leftLen+rightLen];
+        for (int index = 0, i = 0, j = 0; index < result.length; index++) {
+            int l=i<leftLen?left[i]:Integer.MAX_VALUE;
+            int r=j<rightLen?right[j]:Integer.MAX_VALUE;
+            result[index]=l<r?left[i++]:right[j++];
+        }
+        return result;
+    }
+
 
     /**
      * 排序汇总

@@ -47,7 +47,7 @@ public class Storage {
             }
             //满足消费条件开始消费
             for(int i = 0; i < num; i++) {
-                list.remove(i);
+                list.remove(0);
             }
             System.out.println("已消费产品数"+num+" 仓库容量"+list.size());
             list.notifyAll();
@@ -110,5 +110,7 @@ public class Storage {
         p3.start();
         p4.start();
         p5.start();
+
+
     }
 }
