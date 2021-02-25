@@ -177,6 +177,7 @@ public class Sort {
 
 
 
+
     //声明全局变量，用于记录数组array的长度；
     static int len;
     /**

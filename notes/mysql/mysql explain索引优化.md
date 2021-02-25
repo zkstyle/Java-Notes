@@ -135,3 +135,253 @@ B-tree索引 is null不会走,is not null会走,位图索引 is null,is not null
 6. Mysql在使用不等于(!=、<>)或like的左模糊的时候无法试用索引会导致全表扫描
 7. IS NULL和IS NOT NULL也无法使用索引
 8. 少用or，用它来连接时索引会失效
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##  mysql explain 及常见优化手段
+
+在工作中如果遇到慢sql通常都可以用explain进行解析。
+
+先列一下各个列名以及含义
+
+| 列名              | 描述                                               |
+| :---------------- | :------------------------------------------------- |
+| id                | 在一个大的查询中每一个查询关键字都对应一个id       |
+| select type       | select关键字对应的那个查询类型                     |
+| table             | 表名                                               |
+| partitions（*）   | 分配的分区信息                                     |
+| **type**          | 针对单表的访问方法                                 |
+| **possible_keys** | 可能用到的索引                                     |
+| **key**           | 实际上使用的索引                                   |
+| **key len**       | 实际用到的索引长度                                 |
+| ref               | 当索引列等值查询时，与索引列进行等值匹配的对象信息 |
+| rows              | 预估的需要读取的记录条数                           |
+| filtered          | 某个表经过搜索条件过滤后剩余记录条数的百分比       |
+| **extra**         | 一些额外的信息                                     |
+
+## id
+
+一个查询语句就会有一个对应的id，如果其内部包含子查询且没有被查询优化器优化掉的情况下就会出现不同的id……
+
+## select type
+
+1. primary 主查询 （出现子查询的语句时会区分子和主查询）
+
+2. subquery （非相关子查询）
+
+   非相关子查询得到的结果表会被物化，只需要执行一遍
+
+3. dependent query（相关子查询）
+
+   相关子查询可能会被执行多次嗷
+
+4. union 联查时
+
+5. union result 临时表
+
+6. simple 简单查询
+
+7. derived派生表
+
+   出现在有子查询时，如果为该类型则代表该查询是以物化的方式执行的
+
+8. materialized
+
+   当子查询物化后与外层查询进行连接时的查询类型。
+
+## type
+
+1. system
+
+   innodb中不存在，MyISAM、Memory引擎中有，代表精确的查询
+
+2. const
+
+   主键或者唯一二级索引时的常量查询
+
+   例如 `where a=1`,a为主键
+
+3. eq_ref
+
+   代表连接查询时，被驱动表是通过逐渐或者唯一二级索引列等值匹配的方式进行访问的
+
+4. ref
+
+   非主键或者唯一索引时使用索引的查询
+
+5. ref or null
+
+   ref的情况+条件中出现null
+
+6. index merge
+
+   索引合并查询，同时使用了多个索引的情况。
+
+7. unique subquery
+
+   通常出现在相关子查询把in优化为exists而且子查询可以使用主键进行查找时
+
+8. index subquery
+
+   与unique类似，但访问的是普通的索引
+
+9. range
+
+   范围查询时出现
+
+10. index
+
+    查询辅助索引字段时出现，遍历辅助索引值。
+
+11. all
+
+    全表扫描
+
+### key lenth
+
+当前使用索引字段的长度
+
+如果索引值可以为空，key length会多存储一个字节
+
+如果为变长字段（例如varchar），需要2个字节的存储空间存储长度。
+
+## ref
+
+代表驱动查询的字段。
+
+例如在相关子查询中，子查询的驱动字段应该为主查询中表的某个值。
+
+### filtered
+
+通过该索引查询到的数据满足 非索引条件的数据所占的百分比。
+
+```sql
+select * from table where index_case and non_index_case;
+```
+
+假设符合index_case 的值为100个（rows=100），但是符合non_index_case的值为20个，那么filtered就为20。
+
+注：为估算值。
+
+## extra
+
+Extra列是用来说明一些额外信息的，我们可以通过这些额外信息来更准确的理解MySQL到底将如何执行给定的
+查询语句。
+
+1. no tables used
+
+   当查询语句的没有FROM子句时将会提示该额外信息。
+
+2. impossible where
+
+   where子句永远为false
+
+3. no matching min/max row
+
+   查询列表中有min或者max聚集函数，但是并没有where子句中的搜索条件记录时会提示该额外信息
+
+4. using index
+
+   查询列表以及搜索条件中只包含属于某个索引的列，既索引覆盖
+
+5. using index condition
+
+   搜索条件中虽然出现了索引列，但是有部分条件无法使用索引，会根据能用索引的条件先搜索一遍再匹配无法使用索引的条件
+
+6. using where
+
+   全表扫描并且where中有针对该表的搜索条件
+
+7. using join buffer（Block Nested Loop）
+
+   在连接查询执行过程中，当被驱动表不能有效的利用索引加快访问速度时就分配一块join buffer内存块来加快查询速度。
+
+8. using filesort
+
+   多数情况下排序操作无法用到索引，只能在内存中（记录较少时）或者磁盘中进行排序，这种在情况统称为文件排序。
+
+9. using temporary
+
+   在诸多查询过程中，可能会借助临时表来完成一些查询功能，比如去重、排序之类的，比如我们在执行许多包含distinct、group by、union等子句的查询过程中，如果不能有效利用索引完成查询，mysql可能通过建立内部临时表来执行查询。
+
+10. Start temporary, End temporary
+
+    子查询可以优化成半连接，但通过了临时表进行去重
+
+11. firstmatch（table_name）
+
+    子查询时可以优化成半连接，但直接进行数据比较去重
+
+## index hint
+
+### use index
+
+```
+select * from table use index (index_name,index_name2) where case;
+```
+
+强制查询优化器在指定的索引中做选择。
+
+### force index
+
+```sql
+select * from table force index (index_name) where case;
+```
+
+强制查询优化器使用该索引
+
+### ignore index
+
+```sql
+select * from ignore index (index_name) where case;
+```
+
+强制忽略该索引。
+
+## 小结
+
+### 性能按照type排序
+
+system > const > eq_ref > ref > ref_or_null > index_merge > unique_subquery > index_subquery > range >index > ALL
+
+### 性能按照extra排序
+
+1. Using index：用了覆盖索引
+2. Using index condition：用了条件索引（索引下推）
+3. Using where：从索引查出来数据后继续用where条件过滤
+4. Using join buffer (Block Nested Loop)：join的时候利用了join buffer（优化策略：去除外连接、增大join buffer大小）
+5. Using filesort：用了文件排序，排序的时候没有用到索引
+6. Using temporary：用了临时表（优化策略：增加条件以减少结果集、增加索引，思路就是要么减少待排序的数量，要么提前排好序）
+7. Start temporary, End temporary：子查询的时候，可以优化成半连接，但是使用的是通过临时表来去重
+8. FirstMatch(tbl_name)：子查询的时候，可以优化成半连接，但是使用的是直接进行数据比较来去重
+
+### 常见优化手段
+
+1. SQL语句中IN包含的值不应过多，不能超过200个，200个以内查询优化器计算成本时比较精准，超过200个是估算的成本，另外建议能用between就不要用in，这样就可以使用range索引了。
+2. SELECT语句务必指明字段名称：SELECT * 增加很多不必要的消耗（cpu、io、内存、网络带宽）；增加
+   了使用覆盖索引的可能性；当表结构发生改变时，前断也需要更新。所以要求直接在select后面接上字段
+   名。
+3. 当只需要一条数据的时候，使用limit 1
+4. 排序时注意是否能用到索引
+5. 使用or时如果没有用到索引，可以改为union all 或者union
+6. 如果in不能用到索引，可以改成exists看是否能用到索引
+7. 使用合理的分页方式以提高分页的效率
+8. 不建议使用%前缀模糊查询
+9. 避免在where子句中对字段进行表达式操作
+10. 避免隐式类型转换
+11. 对于联合索引来说，要遵守最左前缀法则
+12. 必要时可以使用force index来强制查询走某个索引
+13. 对于联合索引来说，如果存在范围查询，比如between,>,<等条件时，会造成后面的索引字段失效。
+14. 尽量使用inner join，避免left join，让查询优化器来自动选择小表作为驱动表
+15. 必要时刻可以使用straight_join来指定驱动表，前提条件是本身是inner join
